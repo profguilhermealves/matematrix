@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Matematrix — Cidade do Dinheiro</title>
+  <title>Matematrix — Cidade do Dinheiro (Jogável)</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
   <style>
 /* Skip artifact shell — fixed styles served beside every artifact.
@@ -876,7 +876,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         <label for="fb-url-input" style="font-size:13px; font-weight:700; color:#e2e8f0; display:block;">
           URL do Banco Realtime Database:
         </label>
-        <input type="text" id="fb-url-input" class="fb-input" placeholder="https://seu-projeto-default-rtdb.firebaseio.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <input type="text" id="fb-url-input" class="fb-input" placeholder="https://matematrix-94c15-default-rtdb.firebaseio.com" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
 
         <div id="fb-test-status" class="fb-status-box"></div>
 
@@ -1206,6 +1206,11 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       if (rankingList.length === 0) {
         // Initial friendly starter records
         rankingList = [
+          { name: 'PoupaMestre', score: 3200, phase: 50, date: '2025-01-10' },
+          { name: 'InvesteForte', score: 2150, phase: 42, date: '2025-01-09' },
+          { name: 'ReservaOuro', score: 1400, phase: 28, date: '2025-01-08' },
+          { name: 'JuroAmigo', score: 850, phase: 18, date: '2025-01-07' },
+          { name: 'PéDeMeia', score: 400, phase: 10, date: '2025-01-06' }
         ];
       }
       if (rankingList.length > 0) highScore = rankingList[0].score;
@@ -1465,19 +1470,20 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     };
 
     // --- FEATURE C & GLOBAL RANKING REST API (FIREBASE REALTIME DB) ---
+    const DEFAULT_FIREBASE_URL = "https://matematrix-94c15-default-rtdb.firebaseio.com";
     let currentRankingTab = 'local'; // 'local' or 'global'
 
     function getCleanFirebaseUrl() {
       try {
         let raw = (localStorage.getItem('mm_firebase_url') || '').trim();
-        if (!raw) return '';
+        if (!raw) raw = DEFAULT_FIREBASE_URL;
         raw = raw.replace(/\/+$/, '');
         if (!/^https?:\/\//i.test(raw)) {
           raw = 'https://' + raw;
         }
         return raw;
       } catch(e) {
-        return '';
+        return DEFAULT_FIREBASE_URL;
       }
     }
 
@@ -1782,7 +1788,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
         const input = document.getElementById('fb-url-input');
         if (input) {
-          input.value = localStorage.getItem('mm_firebase_url') || '';
+          input.value = getCleanFirebaseUrl();
         }
 
         const statusBox = document.getElementById('fb-test-status');
@@ -1811,13 +1817,8 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         let rawVal = input ? input.value.trim() : '';
 
         if (!rawVal) {
-          if (statusBox) {
-            statusBox.style.display = 'block';
-            statusBox.style.background = '#451a03';
-            statusBox.style.color = '#fef08a';
-            statusBox.textContent = 'Aviso: Insira a URL do Firebase antes de salvar, ou use LIMPAR.';
-          }
-          return;
+          rawVal = DEFAULT_FIREBASE_URL;
+          if (input) input.value = DEFAULT_FIREBASE_URL;
         }
 
         let cleanUrl = rawVal.replace(/\/+$/, '');
@@ -1845,13 +1846,8 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         let rawVal = input ? input.value.trim() : '';
 
         if (!rawVal) {
-          if (statusBox) {
-            statusBox.style.display = 'block';
-            statusBox.style.background = '#450a0a';
-            statusBox.style.color = '#fca5a5';
-            statusBox.textContent = 'Erro: Por favor, digite a URL do banco antes de testar!';
-          }
-          return;
+          rawVal = getCleanFirebaseUrl();
+          if (input) input.value = rawVal;
         }
 
         let cleanUrl = rawVal.replace(/\/+$/, '');
@@ -1908,18 +1904,18 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         initAudio();
         localStorage.removeItem('mm_firebase_url');
         const input = document.getElementById('fb-url-input');
-        if (input) input.value = '';
+        if (input) input.value = DEFAULT_FIREBASE_URL;
 
         const statusBox = document.getElementById('fb-test-status');
         if (statusBox) {
           statusBox.style.display = 'block';
-          statusBox.style.background = '#1e293b';
-          statusBox.style.color = '#cbd5e1';
-          statusBox.textContent = 'Configuração removida. O jogo está operando no modo ranking LOCAL.';
+          statusBox.style.background = '#064e3b';
+          statusBox.style.color = '#a7f3d0';
+          statusBox.textContent = '✔ URL restaurada para o padrão oficial do Matematrix.';
         }
-        showToast('Ranking global desativado (apenas local)');
+        showToast('Restaurado para o servidor global padrão');
       } catch(e) {
-        showError('Erro ao limpar configuração: ' + e.message);
+        showError('Erro ao restaurar configuração: ' + e.message);
       }
     };
 
